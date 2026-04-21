@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this benchmark, please cite both the software and the paper."
+title: "Metacognitive Profile Atlas"
+authors:
+  - family-names: Cacioli
+    given-names: Jon-Paul
+    orcid: https://orcid.org/0009-0000-7054-2014
+    affiliation: "Independent Researcher, Melbourne, Australia"
+version: "1.0.0"
+date-released: "2026-04-21"
+license: MIT
+repository-code: "https://github.com/synthiumjp/metacognitive-profile-atlas"
+abstract: >
+  A domain-stratified benchmark for LLM metacognitive monitoring.
+  1,500 MMLU items, 33 frontier LLMs, 47,151 observations. Type-2
+  AUROC per model-domain cell with bootstrap 95% CIs. Companion to
+  Cacioli (2026) arXiv preprint.
+keywords:
+  - large-language-models
+  - metacognition
+  - confidence-calibration
+  - benchmarks
+  - psychometrics
+preferred-citation:
+  type: article
+  title: "Domain-level metacognitive monitoring in frontier LLMs: A 33-model atlas"
+  authors:
+    - family-names: Cacioli
+      given-names: Jon-Paul
+      orcid: https://orcid.org/0009-0000-7054-2014
+  year: 2026
+  url: "https://github.com/synthiumjp/metacognitive-profile-atlas"
+  notes: "arXiv preprint pending."
