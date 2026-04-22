@@ -34,7 +34,7 @@
       "@type": "cr:FileObject",
       "name": "model-results",
       "description": "33 CSV files, one per model, containing item-level answer, confidence, and correctness data.",
-      "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/tree/main/data",
+      "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/tree/main",
       "encodingFormat": "text/csv"
     },
     {
