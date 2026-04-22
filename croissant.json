@@ -1,24 +1,64 @@
 {
   "@context": {
+    "@language": "en",
     "@vocab": "https://schema.org/",
-    "sc": "https://schema.org/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
     "cr": "http://mlcommons.org/croissant/",
-    "rai": "http://mlcommons.org/croissant/RAI/"
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "dct": "http://purl.org/dc/terms/",
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "sc": "https://schema.org/",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform"
   },
   "@type": "sc:Dataset",
   "name": "metacognitive-profile-atlas",
   "description": "47,151 verbalized-confidence-plus-answer observations from 33 frontier LLMs on 1,500 stratified MMLU items across six cognitive domains. Enables domain-level decomposition of Type-2 AUROC for metacognitive monitoring quality evaluation.",
+  "conformsTo": "http://mlcommons.org/croissant/1.0",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "url": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas",
   "version": "1.0.0",
   "datePublished": "2026-04-22",
+  "citeAs": "Cacioli, J. P. (2026). Domain-level metacognitive monitoring in frontier LLMs: A 33-model atlas. arXiv preprint.",
   "creator": {
     "@type": "Person",
     "name": "Jon-Paul Cacioli",
     "email": "synthium@hotmail.com",
     "identifier": "https://orcid.org/0009-0000-7054-2014"
   },
-  "citation": "Cacioli, J. P. (2026). Domain-level metacognitive monitoring in frontier LLMs: A 33-model atlas. arXiv preprint.",
   "keywords": [
     "metacognition",
     "confidence calibration",
@@ -28,72 +68,238 @@
     "psychometrics",
     "domain profiling"
   ],
-
   "distribution": [
     {
-      "@type": "sc:FileSet",
-      "name": "model-results",
-      "description": "33 CSV files, one per model, containing item-level answer, confidence, and correctness data.",
-      "containedIn": {"@id": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/tree/main"},
-      "includes": "metacognitive_profile_results*.csv",
-      "encodingFormat": "text/csv"
+      "@type": "cr:FileObject",
+      "@id": "hf-repo",
+      "name": "hf-repo",
+      "description": "HuggingFace dataset repository.",
+      "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas",
+      "encodingFormat": "git+https",
+      "sha256": "main"
     },
     {
-      "@type": "sc:FileObject",
+      "@type": "cr:FileSet",
+      "@id": "model-csvs",
+      "name": "model-csvs",
+      "description": "33 CSV files, one per model, containing item-level answer, confidence, and correctness data.",
+      "containedIn": {
+        "@id": "hf-repo"
+      },
+      "encodingFormat": "text/csv",
+      "includes": "metacognitive_profile_results*.csv"
+    },
+    {
+      "@type": "cr:FileObject",
+      "@id": "bootstrap-cis",
       "name": "bootstrap-cis",
       "description": "Bootstrap 95% CIs for all 198 model-domain AUROC cells (1,000 resamples, seed=42).",
-      "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/blob/main/atlas_bootstrap_cis.csv",
-      "encodingFormat": "text/csv",
-      "sha256": "2e3a5cc50b237ba873ef51d7219291e6062558d12fe49c467994c56b3baff6b5"
+      "contentUrl": "atlas_bootstrap_cis.csv",
+      "containedIn": {
+        "@id": "hf-repo"
+      },
+      "encodingFormat": "text/csv"
     }
   ],
-
   "recordSet": [
     {
       "@type": "cr:RecordSet",
+      "@id": "item-level-observations",
       "name": "item-level-observations",
-      "description": "One row per (model, item) pair. 47,151 total observations.",
+      "description": "One row per (model, item) pair. 47,151 total observations across 33 models.",
       "field": [
-        {"@type": "cr:Field", "name": "item_id", "description": "MMLU item index in test split", "dataType": "sc:Integer"},
-        {"@type": "cr:Field", "name": "subject", "description": "MMLU subject (e.g. professional_law)", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "domain", "description": "Cognitive domain bin: applied_professional, factual_recall, formal_reasoning, humanities, natural_science, social_moral", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "question", "description": "MMLU item question text", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "answer", "description": "Model's selected answer (A/B/C/D)", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "correct_answer", "description": "Ground-truth answer (A/B/C/D)", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "is_correct", "description": "True if correct, False if incorrect", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "confidence", "description": "Model's verbalized confidence (0-100)", "dataType": "sc:Integer"},
-        {"@type": "cr:Field", "name": "model", "description": "Model canonical ID (e.g. anthropic/claude-opus-4-6@default)", "dataType": "sc:Text"}
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/item_id",
+          "name": "item_id",
+          "description": "MMLU item index in test split",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "item_id" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/subject",
+          "name": "subject",
+          "description": "MMLU subject (e.g. professional_law)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "subject" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/domain",
+          "name": "domain",
+          "description": "Cognitive domain bin: applied_professional, factual_recall, formal_reasoning, humanities, natural_science, social_moral",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "domain" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/question",
+          "name": "question",
+          "description": "MMLU item question text",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "question" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/answer",
+          "name": "answer",
+          "description": "Model's selected answer (A/B/C/D)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "answer" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/correct_answer",
+          "name": "correct_answer",
+          "description": "Ground-truth answer (A/B/C/D)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "correct_answer" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/is_correct",
+          "name": "is_correct",
+          "description": "True if correct, False if incorrect",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "is_correct" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/confidence",
+          "name": "confidence",
+          "description": "Model's verbalized confidence (0-100)",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "confidence" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "item-level-observations/model",
+          "name": "model",
+          "description": "Model canonical ID (e.g. anthropic/claude-opus-4-6@default)",
+          "dataType": "sc:Text",
+          "source": {
+            "fileSet": { "@id": "model-csvs" },
+            "extract": { "column": "model" }
+          }
+        }
       ]
     },
     {
       "@type": "cr:RecordSet",
+      "@id": "bootstrap-confidence-intervals",
       "name": "bootstrap-confidence-intervals",
       "description": "Bootstrap 95% CIs for 198 model-domain AUROC cells.",
       "field": [
-        {"@type": "cr:Field", "name": "model", "description": "Model name", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "domain", "description": "Cognitive domain", "dataType": "sc:Text"},
-        {"@type": "cr:Field", "name": "n", "description": "Number of items in cell", "dataType": "sc:Integer"},
-        {"@type": "cr:Field", "name": "auroc", "description": "Type-2 AUROC", "dataType": "sc:Float"},
-        {"@type": "cr:Field", "name": "ci_lo", "description": "Bootstrap 95% CI lower bound", "dataType": "sc:Float"},
-        {"@type": "cr:Field", "name": "ci_hi", "description": "Bootstrap 95% CI upper bound", "dataType": "sc:Float"},
-        {"@type": "cr:Field", "name": "ci_w", "description": "CI width", "dataType": "sc:Float"}
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/model",
+          "name": "model",
+          "description": "Model short display name",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "model" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/domain",
+          "name": "domain",
+          "description": "Cognitive domain",
+          "dataType": "sc:Text",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "domain" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/n",
+          "name": "n",
+          "description": "Number of items in cell",
+          "dataType": "sc:Integer",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "n" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/auroc",
+          "name": "auroc",
+          "description": "Type-2 AUROC",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "auroc" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/ci_lo",
+          "name": "ci_lo",
+          "description": "Bootstrap 95% CI lower bound",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "ci_lo" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/ci_hi",
+          "name": "ci_hi",
+          "description": "Bootstrap 95% CI upper bound",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "ci_hi" }
+          }
+        },
+        {
+          "@type": "cr:Field",
+          "@id": "bootstrap-confidence-intervals/ci_w",
+          "name": "ci_w",
+          "description": "CI width",
+          "dataType": "sc:Float",
+          "source": {
+            "fileObject": { "@id": "bootstrap-cis" },
+            "extract": { "column": "ci_w" }
+          }
+        }
       ]
     }
   ],
-
   "rai:dataCollection": "Items are 1,500 MMLU (Hendrycks et al., 2021) test-split questions drawn deterministically (seed=42) and stratified 250 per cognitive domain. 56 of 57 MMLU subjects mapped a priori to six domains; elementary_mathematics excluded. Each model was prompted to answer (A-D) and state confidence (0-100) in a fixed template with independent conversation context per item. Greedy decoding (temperature 0). Data collected March-April 2026 via the Kaggle Benchmarks platform API.",
-
   "rai:dataUseCases": "Evaluation of LLM metacognitive monitoring quality at the domain level. Intended for benchmark-stage screening before deploying confidence-based abstention, routing, or escalation systems. Not intended for model training or as a deployment certification.",
-
   "rai:dataLimitations": "Single benchmark (MMLU) with a priori domain mapping that is not factor-analytically validated (within-domain subject coherence ratio 0.95). Verbalized confidence only; probe-format specificity demonstrates measurement method modulates quality. Greedy decoding only. English only. Snapshot from March-April 2026; model behaviour may change. Median bootstrap CI width .199; 34% of cells exceed .25, concentrated in high-accuracy models. 12 of 33 models have partial runs due to API instability (minimum 598 items for GLM-5).",
-
   "rai:personalSensitiveInformation": "None. All data are LLM outputs on public benchmark items. No human subjects, no personal data, no demographic information.",
-
   "rai:annotationsPerItem": "Self-generated by each model. No human annotation. Each item has exactly one (answer, confidence) pair per model.",
-
   "rai:socialImpact": "Low risk. The dataset documents model behaviour on a public benchmark and does not enable new capabilities. Intended to improve safety of confidence-based deployment decisions by revealing domain-level weaknesses that aggregate metrics obscure.",
-
-  "rai:biasAnalysis": "No demographic or social bias analysis is applicable; the dataset contains LLM outputs on academic multiple-choice items. Domain-level variation reflects differential monitoring quality across task content, not social bias. The domain hierarchy (Applied easiest, Formal hardest) is not an accuracy artefact (Applied has the lowest mean accuracy; Spearman rho = -.37 between domain accuracy and domain AUROC).",
-
   "rai:maintenancePlan": "Author commits to maintaining the dataset and repository for a minimum of 2 years (through April 2028). Updates will be versioned. The benchmark notebook on Kaggle supports adding new models."
 }
