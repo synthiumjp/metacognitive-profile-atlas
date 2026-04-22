@@ -31,10 +31,11 @@
 
   "distribution": [
     {
-      "@type": "sc:FileObject",
+      "@type": "sc:FileSet",
       "name": "model-results",
       "description": "33 CSV files, one per model, containing item-level answer, confidence, and correctness data.",
-      "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/tree/main",
+      "containedIn": {"@id": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/tree/main"},
+      "includes": "metacognitive_profile_results*.csv",
       "encodingFormat": "text/csv"
     },
     {
@@ -42,7 +43,8 @@
       "name": "bootstrap-cis",
       "description": "Bootstrap 95% CIs for all 198 model-domain AUROC cells (1,000 resamples, seed=42).",
       "contentUrl": "https://huggingface.co/datasets/synthiumjp/metacognitive-profile-atlas/blob/main/atlas_bootstrap_cis.csv",
-      "encodingFormat": "text/csv"
+      "encodingFormat": "text/csv",
+      "sha256": "2e3a5cc50b237ba873ef51d7219291e6062558d12fe49c467994c56b3baff6b5"
     }
   ],
 
