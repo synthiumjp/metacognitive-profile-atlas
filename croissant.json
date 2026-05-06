@@ -42,7 +42,8 @@
     "separator": "cr:separator",
     "source": "cr:source",
     "subField": "cr:subField",
-    "transform": "cr:transform"
+    "transform": "cr:transform",
+    "prov": "http://www.w3.org/ns/prov#"
   },
   "@type": "sc:Dataset",
   "name": "metacognitive-profile-atlas",
@@ -115,8 +116,12 @@
           "description": "MMLU item index in test split",
           "dataType": "sc:Integer",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "item_id" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "item_id"
+            }
           }
         },
         {
@@ -126,8 +131,12 @@
           "description": "MMLU subject (e.g. professional_law)",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "subject" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "subject"
+            }
           }
         },
         {
@@ -137,8 +146,12 @@
           "description": "Cognitive domain bin: applied_professional, factual_recall, formal_reasoning, humanities, natural_science, social_moral",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "domain" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "domain"
+            }
           }
         },
         {
@@ -148,8 +161,12 @@
           "description": "MMLU item question text",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "question" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "question"
+            }
           }
         },
         {
@@ -159,8 +176,12 @@
           "description": "Model's selected answer (A/B/C/D)",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "answer" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "answer"
+            }
           }
         },
         {
@@ -170,8 +191,12 @@
           "description": "Ground-truth answer (A/B/C/D)",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "correct_answer" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "correct_answer"
+            }
           }
         },
         {
@@ -181,8 +206,12 @@
           "description": "True if correct, False if incorrect",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "is_correct" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "is_correct"
+            }
           }
         },
         {
@@ -192,8 +221,12 @@
           "description": "Model's verbalized confidence (0-100)",
           "dataType": "sc:Integer",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "confidence" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "confidence"
+            }
           }
         },
         {
@@ -203,8 +236,12 @@
           "description": "Model canonical ID (e.g. anthropic/claude-opus-4-6@default)",
           "dataType": "sc:Text",
           "source": {
-            "fileSet": { "@id": "model-csvs" },
-            "extract": { "column": "model" }
+            "fileSet": {
+              "@id": "model-csvs"
+            },
+            "extract": {
+              "column": "model"
+            }
           }
         }
       ]
@@ -222,8 +259,12 @@
           "description": "Model short display name",
           "dataType": "sc:Text",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "model" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "model"
+            }
           }
         },
         {
@@ -233,8 +274,12 @@
           "description": "Cognitive domain",
           "dataType": "sc:Text",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "domain" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "domain"
+            }
           }
         },
         {
@@ -244,8 +289,12 @@
           "description": "Number of items in cell",
           "dataType": "sc:Integer",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "n" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "n"
+            }
           }
         },
         {
@@ -255,8 +304,12 @@
           "description": "Type-2 AUROC",
           "dataType": "sc:Float",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "auroc" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "auroc"
+            }
           }
         },
         {
@@ -266,8 +319,12 @@
           "description": "Bootstrap 95% CI lower bound",
           "dataType": "sc:Float",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "ci_lo" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "ci_lo"
+            }
           }
         },
         {
@@ -277,8 +334,12 @@
           "description": "Bootstrap 95% CI upper bound",
           "dataType": "sc:Float",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "ci_hi" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "ci_hi"
+            }
           }
         },
         {
@@ -288,8 +349,12 @@
           "description": "CI width",
           "dataType": "sc:Float",
           "source": {
-            "fileObject": { "@id": "bootstrap-cis" },
-            "extract": { "column": "ci_w" }
+            "fileObject": {
+              "@id": "bootstrap-cis"
+            },
+            "extract": {
+              "column": "ci_w"
+            }
           }
         }
       ]
@@ -303,6 +368,34 @@
   "rai:socialImpact": "Low risk. The dataset documents model behaviour on a public benchmark and does not enable new capabilities. Intended to improve safety of confidence-based deployment decisions by revealing domain-level weaknesses that aggregate metrics obscure.",
   "rai:dataSocialImpact": "Low risk. The dataset documents model behaviour on a public benchmark and does not enable new capabilities. Intended to improve safety of confidence-based deployment decisions by revealing domain-level weaknesses that aggregate metrics obscure.",
   "rai:dataBiases": "No demographic or social bias analysis is applicable; the dataset contains LLM outputs on academic multiple-choice items. Domain-level variation reflects differential monitoring quality across task content, not social bias. The domain hierarchy (Applied easiest, Formal hardest) is not an accuracy artefact (Applied has the lowest mean accuracy; Spearman rho = -.37 between domain accuracy and domain AUROC).",
-  "rai:hasSyntheticData": "The dataset consists entirely of LLM-generated outputs (answers and verbalized confidence scores). No human-generated or crowd-sourced data. The MMLU items used as stimuli are from an existing public benchmark (Hendrycks et al., 2021).",
-  "rai:maintenancePlan": "Author commits to maintaining the dataset and repository for a minimum of 2 years (through April 2028). Updates will be versioned. The benchmark notebook on Kaggle supports adding new models."
+  "rai:hasSyntheticData": true,
+  "rai:maintenancePlan": "Author commits to maintaining the dataset and repository for a minimum of 2 years (through April 2028). Updates will be versioned. The benchmark notebook on Kaggle supports adding new models.",
+  "prov:wasDerivedFrom": [
+    {
+      "@id": "https://huggingface.co/datasets/cais/mmlu",
+      "prov:label": "MMLU",
+      "sc:license": "MIT",
+      "prov:wasAttributedTo": {
+        "prov:label": "Center for AI Safety"
+      }
+    }
+  ],
+  "prov:wasGeneratedBy": [
+    {
+      "@type": "prov:Activity",
+      "prov:type": {
+        "@id": "https://www.wikidata.org/wiki/Q4929239"
+      },
+      "prov:label": "MMLU item elicitation",
+      "sc:description": "1,500 items drawn deterministically (seed=42) from the MMLU test split, stratified 250 per cognitive domain. Each item administered to 33 frontier LLMs via the Kaggle Benchmarks API with independent conversation context, greedy decoding (temperature 0), and a fixed prompt requesting answer (A-D) and confidence (0-100)."
+    },
+    {
+      "@type": "prov:Activity",
+      "prov:type": {
+        "@id": "https://www.wikidata.org/wiki/Q5227332"
+      },
+      "prov:label": "Deduplication",
+      "sc:description": "Duplicate item-model rows from overlapping benchmark runs removed by keeping first occurrence per (model, item_id, domain) triple. Correctness labels computed by comparing model answers to MMLU ground truth. No human annotation."
+    }
+  ]
 }
