@@ -4,13 +4,13 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 rng = np.random.default_rng(42)
-RAW = sorted(glob.glob("/home/claude/atlas/data/raw/*.csv"))
+RAW = sorted(glob.glob("../../data/raw/*.csv"))
 data = pd.concat([pd.read_csv(f) for f in RAW], ignore_index=True)
 data = data.drop_duplicates(subset=["model", "item_id", "domain"], keep="first")
 data["is_correct"] = data["is_correct"].astype(str).str.lower().eq("true")
 data["confidence"] = pd.to_numeric(data["confidence"], errors="coerce")
 mapping = {}
-for line in open("/home/claude/atlas/data/README.md"):
+for line in open("../../data/README.md"):
     m = re.match(r"\| (.+?) \| (.+?) \| (.+?) \|", line.strip())
     if m and "/" in m.group(2):
         mapping[m.group(2).strip()] = m.group(1).strip()

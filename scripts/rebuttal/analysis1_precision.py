@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.stats import friedmanchisquare
 from sklearn.metrics import roc_auc_score
 
-RAW = sorted(glob.glob("/home/claude/atlas/data/raw/*.csv"))
+RAW = sorted(glob.glob("../../data/raw/*.csv"))
 frames = [pd.read_csv(f) for f in RAW]
 data = pd.concat(frames, ignore_index=True)
 data = data.drop_duplicates(subset=["model", "item_id", "domain"], keep="first")
@@ -16,7 +16,7 @@ print(f"Models: {data['model'].nunique()}")
 
 # short-name mapping from data/README.md
 mapping = {}
-for line in open("/home/claude/atlas/data/README.md"):
+for line in open("../../data/README.md"):
     m = re.match(r"\| (.+?) \| (.+?) \| (.+?) \|", line.strip())
     if m and "/" in m.group(2):
         mapping[m.group(2).strip()] = (m.group(1).strip(), m.group(3).strip())
@@ -44,7 +44,7 @@ for (short, dom), g in data.groupby(["short", "dom"]):
 cells = pd.DataFrame(rows)
 
 # merge CI widths
-cis = pd.read_csv("/home/claude/atlas/data/atlas_bootstrap_cis.csv")
+cis = pd.read_csv("../../data/atlas_bootstrap_cis.csv")
 cells = cells.merge(cis.rename(columns={"model": "short", "domain": "dom"})[["short", "dom", "auroc", "ci_lo", "ci_hi", "ci_w"]],
                     on=["short", "dom"], suffixes=("_recomp", ""), how="left")
 print(f"\nCells: {len(cells)}; missing CI merge: {cells['ci_w'].isna().sum()}")
@@ -90,5 +90,5 @@ ivw = c.groupby("dom").apply(lambda g: np.average(g["auroc"], weights=g["w"])).s
 print(ivw.round(4))
 
 # rank stability under exclusion: is Applied top and Formal/Science bottom-2 in every variant?
-cells.to_csv("/home/claude/cells_with_errors.csv", index=False)
+cells.to_csv("./cells_with_errors.csv", index=False)
 print("\nSaved cells_with_errors.csv")
