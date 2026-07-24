@@ -15,12 +15,12 @@ An atlas of Type-2 AUROC (confidence discriminating correct from incorrect respo
 
 **Key findings:**
 
-- Applied/Professional knowledge is reliably the easiest of these MMLU domains to monitor (mean AUROC .742, top-2 in 21/33 models). Formal Reasoning and Natural Science are the hardest (bottom-2 in 27/33). The ordering strengthens under precision weighting: excluding imprecise cells widens the extremum gap from .090 to .161 and raises Kendall's W from .164 to .317.
+- Applied/Professional knowledge is reliably the easiest of these MMLU domains to monitor (mean AUROC .742, top-2 in 21/33 models). Formal Reasoning and Natural Science are the hardest (bottom-2 in 27/33). The ordering strengthens under precision weighting: excluding imprecise cells widens the extremum gap from .090 to .161 and raises Kendall's W from .164 to .317. Bootstrap rank stability over 500 item-level resamples puts Applied first in 99.8% of resamples, Science in the bottom two in 97.6% and Formal in 89.0%. Holm-corrected pairwise contrasts show only the four Applied-versus-other pairs survive correction: Applied is the one reliably distinct extremum, and Formal/Science form an undifferentiated bottom set.
 - Within-family profile-shape clustering is significant at the population level (permutation test, p < .0001). Per-family tests with Holm correction support Anthropic (p_holm = .014); Google-Gemini and Qwen are nominally significant (p = .017) but do not survive correction and are reported as exploratory.
 - Generational AUROC gains decompose into distinct mechanisms on paired items. Gemma 4 31B's +.202 over Gemma 3 27B is primarily error composition (it answers 82.6% of Gemma 3's high-confidence errors correctly, with confidence on residual errors unchanged). The Anthropic Opus trajectory shows genuine monitoring improvement (lower confidence on persisting errors, p < 1e-4).
 - Three models classified Invalid on binary KEEP/WITHDRAW probes produce valid profiles under verbalized confidence (probe-format specificity).
 
-**Scope.** All results are MMLU-specific; replication on an independent benchmark is untested. Individual model profiles have weak split-half reliability (median r = .167), so interpretation rests on the population-level extremum contrast, which is reliable (split-half r = .342, sign replicated in 50/50 splits). Per-model profiles and family clustering are released as exploratory structure. Type-2 AUROC measures discrimination, not calibration.
+**Scope.** All results are MMLU-specific; replication on an independent benchmark is untested. Individual model profiles have weak split-half reliability (median r = .167), so interpretation rests on the population-level extremum contrast, which is reliable (split-half r = .342, Spearman-Brown full-length .51; sign replicated in 50/50 splits). Per-model profiles and family clustering are released as exploratory structure. Type-2 AUROC measures discrimination, not calibration.
 
 **Paper**: Cacioli, J. P. (2026). Domain-level metacognitive monitoring in frontier LLMs: A 33-model atlas. [arXiv:2605.06673](https://arxiv.org/abs/2605.06673).
 
@@ -62,7 +62,8 @@ metacognitive-profile-atlas/
 │   ├── atlas_summary_matrix.csv        # 33×6 AUROC matrix
 │   ├── atlas_cell_error_counts.csv     # per-cell n, errors, accuracy, AUROC, CI
 │   ├── mmlu_item_locators.csv          # item_id → MMLU (subject, split, row_index)
-│   └── parsing_fallback_counts.csv     # per-model extraction fallback counts
+│   ├── parsing_fallback_counts.csv     # per-model extraction fallback counts
+│   └── thinking_conf_*.csv             # reasoning-block confidence discrepancies
 ├── docs/
 │   └── parsing_protocol.md             # answer/confidence extraction rules
 ├── notebooks/
@@ -71,8 +72,12 @@ metacognitive-profile-atlas/
 │   ├── 01_load_data.py … 07_figures.py # analysis pipeline
 │   ├── make_mmlu_locators.py           # regenerate + verify the item pool
 │   ├── verify_parsing.py               # re-run extraction over raw outputs
-│   └── rebuttal/                       # precision weighting, generational,
-│                                       #   per-family permutation, reliability
+│   ├── thinking_confidence_check.py    # reasoning-block extraction diagnostic
+│   ├── patch_croissant.py              # metadata maintenance
+│   └── rebuttal/                       # precision weighting, rank stability,
+│                                       #   generational decomposition, per-family
+│                                       #   permutation, pairwise contrasts,
+│                                       #   reliability
 ├── figures/                            # 7 PDFs + 7 PNGs at 300 dpi
 ├── reproduce.py                        # single-command regeneration
 ├── croissant.json                      # Croissant metadata (Core + RAI)
@@ -87,9 +92,11 @@ Every step is auditable end to end:
 
 - **Item pool**: `python scripts/make_mmlu_locators.py` reconstructs the seed-42 stratified sample from `cais/mmlu` and verifies it against the released CSVs (1,500 rows; 100% agreement on subject, domain, and question text). `data/mmlu_item_locators.csv` gives the canonical MMLU (subject, split, row_index) tuple for every item.
 - **Parsing**: `python scripts/verify_parsing.py` re-runs the extraction rules over the raw outputs, regenerating 47,151 observations — matching the released corpus exactly. Rules and their per-model incidence are documented in `docs/parsing_protocol.md`.
-- **Analysis**: `python reproduce.py` regenerates the matrix, CIs, and inferential tests. `scripts/rebuttal/` reproduces the precision-weighting, generational-decomposition, per-family permutation, and reliability analyses.
+- **Analysis**: `python reproduce.py` regenerates the matrix, CIs, and inferential tests. `scripts/rebuttal/` reproduces the precision-weighting, bootstrap rank-stability, generational-decomposition, per-family permutation, Holm-corrected pairwise-contrast, and reliability analyses.
 
 **One parsing caveat.** The confidence extractor imputes 50 when no value parses. This fired on 985 of 47,151 responses (2.09%), of which 980 belong to GPT-oss-120B alone (65.3% of its items); five across the other 32 models combined. GPT-oss-120B has no response stating a confidence of 50, so every 50 in its series is imputed. Treat its confidence distribution as partly imputed.
+
+**One reasoning-model detail.** DeepSeek-R1 is the only model returning an explicit `<think>` block, and states a confidence value inside it on 981 of 1,500 items. Because extraction takes the first match in the full response, the recorded value is the mid-reasoning one where present; it differs from the final-block value on 82 responses (5.5%), and substituting final-block values throughout moves R1's aggregate AUROC from .769 to .766. `scripts/thinking_confidence_check.py` reproduces this.
 
 **One exclusion.** Gemma 4 26B A4B appears in the task's model list but never executed (queued, no start timestamp, no logs, no output). It is excluded because no data exists for it. No model was excluded on the basis of its parsed responses.
 
