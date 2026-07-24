@@ -32,10 +32,11 @@ Applied in order; first match wins:
 2. Fallback: first standalone `\b([A-D])\b` in the response.
 3. If neither matches: the answer is recorded as `X` and scored incorrect.
 
-Observed effect: 13 of 47,151 observations (0.028%) fell through to `X`,
-distributed GPT-oss-120B (5), Gemini 3.1 FLite (2), Gemma 3 27B (2),
-Haiku 4.5 (2), Gemma 3 12B (1), Qwen 80B Inst (1). No model exceeds 5 `X`
-records; `X` records are retained and scored incorrect rather than dropped.
+Observed effect, verified by re-running extraction over the raw run outputs:
+13 of 47,151 responses (0.028%) fell through to `X` — GPT-oss-120B (5),
+Gemini 3.1 FLite (2), Gemma 3 27B (2), Haiku 4.5 (2), Gemma 3 12B (1),
+Qwen 80B Inst (1). No model exceeds 5. `X` records are retained and scored
+incorrect rather than dropped.
 
 ## Confidence extraction
 
@@ -46,11 +47,13 @@ Applied in order; first match wins:
    [0, 100].
 3. If neither matches: the value is **imputed as 50**.
 
-Observed effect and one material caveat: the imputed-50 fallback is
-consequential for exactly one model. **GPT-oss-120B has confidence == 50 on
-65.3% of items**; for every other model the rate is below 0.3%. GPT-oss-120B's
-responses frequently omitted a parseable confidence statement, so its
-distribution is dominated by the imputation value rather than by expressed
+Observed effect and one material caveat. The fallback fired on 985 of 47,151
+responses (2.09%), concentrated almost entirely in one model: **GPT-oss-120B
+accounts for 980 of them (65.3% of its 1,500 responses)**, leaving 5 across the
+other 32 models combined. Separating imputed from expressed values in the raw
+outputs shows GPT-oss-120B has **no** response stating a confidence of 50, so
+every 50 in its series is imputed rather than expressed. Its distribution is
+therefore dominated by the imputation value rather than by expressed
 confidence. This is consistent with the model's anomalous profile reported in
 the paper (confidence SD 21.3 driven by a bimodal expressed/imputed mixture,
 aggregate AUROC .530). Readers should treat GPT-oss-120B's confidence
@@ -72,10 +75,12 @@ imputation.
 
 ## Model-level exclusion
 
-Gemma 4 26B A4B was excluded entirely: the model repeatedly failed to emit
-parseable output under the fixed template (API-side failures at the
-item-response level), leaving too few valid items to screen. Its exclusion is
-a parsing/availability decision, not a result-driven one.
+No model was excluded on the basis of its parsed responses.
+
+Gemma 4 26B A4B appears in the benchmark task's model list but never executed.
+The run (ID 263787) was queued and remained in an unstarted state: no start or
+end timestamp, no logs, no output. It is excluded because no data exists for
+it, not because of anything in its responses.
 
 ## Median binarisation
 
@@ -87,7 +92,8 @@ series; binarisation affects only the screen, not the AUROC hierarchy.
 ## Reproduction
 
 `notebooks/atlas_benchmark.py` contains `parse_answer` and `parse_confidence`
-verbatim. Running them over the raw `.run.json` files in the HuggingFace
-`raw_outputs/` directory regenerates the released CSV columns exactly; the
-per-model `X` counts and confidence==50 rates above were computed by that
-round-trip.
+verbatim. `scripts/verify_parsing.py` re-runs them over the raw `.run.json`
+files in the HuggingFace `raw_outputs/` directory: the round-trip yields
+47,151 responses, matching the released corpus exactly, and every count in this
+document was produced by it. Per-model fallback counts are released as
+`data/parsing_fallback_counts.csv`.
