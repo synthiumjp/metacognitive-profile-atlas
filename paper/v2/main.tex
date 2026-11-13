@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage[preprint]{neurips_2026}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{xurl}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{framed}
+\graphicspath{{./}{../../figures/}}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!50!black,
+    citecolor=blue!50!black,
+    urlcolor=blue!60!black,
+    pdftitle={The Metacognitive Profile Atlas},
+    pdfauthor={Jon-Paul Cacioli},
+}
+
+\title{The Metacognitive Profile Atlas: \\
+       Domain-level confidence discrimination in 33 frontier LLMs on MMLU}
+
+\author{%
+  Jon-Paul Cacioli \\
+  Independent Researcher, Melbourne, Australia \\
+  ORCID: 0009-0000-7054-2014 \\
+  \url{https://github.com/synthiumjp/metacognitive-profile-atlas}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We release the Metacognitive Profile Atlas, a corpus of answer-plus-verbalized-confidence data from 33 frontier LLMs on 1{,}500 MMLU items stratified into six subject-group bins (46{,}157 scored observations after excluding parser-supplied values). The data allow Type-2 AUROC, the degree to which confidence discriminates correct from incorrect answers, to be decomposed by domain. The reliable finding is a population-level ordering on MMLU. Confidence discriminates best on Applied/Professional items (mean AUROC .750; ranked first in 100\% of bootstrap resamples) and worst on Formal Reasoning and Natural Science (bottom two in 93\% and 92\%; Friedman $\chi^2(5) = 28.26$, $p < .0001$). After Holm correction Applied exceeds Formal, Science, Social and Humanities; no other pair survives, including Applied versus Factual. The ordering holds when imprecise cells are excluded or down-weighted. Per-model six-domain profiles are not reliable (median split-half $r = .16$) and are released for exploration only; the six bins are a pragmatic grouping, not a latent construct. Within-family similarity of profile shape is significant overall, but after multiplicity correction only Anthropic is individually supported. Paired-item analysis separates genuine monitoring gains (Opus 4.1 to 4.5 and 4.7) from error removal (Gemma 3 27B to Gemma 4 31B). Models whose binary-probe confidence failed or could not be certified on a separate battery discriminate well under verbalized confidence, and three Gemma 3 models show the reverse pattern. This version incorporates revisions committed during peer review, corrects descriptions of external validity-screen results, and excludes 980 parser-imputed confidence values for GPT-oss-120B, whose v1 profile was an artefact of them.
+\end{abstract}
+
+\begin{framed}
+\noindent\textbf{Changes in version 2.} (1) GPT-oss-120B: 980 of its 1{,}500 confidence values were a parser default (50), not model output. Version 1 analysed them and described the result (AUROC .530, confidence SD 21.3) as an anomalous monitoring profile. They are now excluded, along with five such values in four other models and 13 unparsed answers, and all analyses, tables and figures are recomputed, with bootstrap intervals now seeded per cell; on its 518 genuine responses GPT-oss-120B has AUROC .800. (2) Claims about models being ``Invalid'' on a binary-probe battery relied on arXiv:2604.17707/17714v1, which contained a scoring error; corrected classifications (arXiv:2604.17714v2) are used here, and DeepSeek-R1 is not described as inverted. (3) Revisions committed during review are incorporated: claims narrowed to the population-level extremum ordering; precision-weighted, rank-stability and Holm-corrected analyses; paired-item decomposition of generational gains; per-family multiplicity correction; a parsing appendix; and the excluded MMLU subject corrected (\texttt{college\_medicine}, not \texttt{elementary\_mathematics}). Appendix~\ref{app:changes} lists the changed claims.
+\end{framed}
+
+\input{body.tex}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\renewcommand{\thetable}{A\arabic{table}}
+\renewcommand{\thefigure}{A\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+\makeatletter
+\renewcommand{\theHtable}{A\arabic{table}}
+\renewcommand{\theHfigure}{A\arabic{figure}}
+\makeatother
+
+\input{appendix.tex}
+
+\end{document}

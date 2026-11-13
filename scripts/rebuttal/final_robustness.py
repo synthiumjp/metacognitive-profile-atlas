@@ -12,13 +12,13 @@ from scipy.stats import wilcoxon
 from sklearn.metrics import roc_auc_score
 
 rng = np.random.default_rng(42)
-RAW = sorted(glob.glob("/home/claude/atlas/data/raw/*.csv"))
+RAW = sorted(glob.glob("../../data/raw/*.csv"))
 data = pd.concat([pd.read_csv(f) for f in RAW], ignore_index=True)
 data = data.drop_duplicates(subset=["model", "item_id", "domain"], keep="first")
 data["is_correct"] = data["is_correct"].astype(str).str.lower().eq("true")
 data["confidence"] = pd.to_numeric(data["confidence"], errors="coerce")
 mapping = {}
-for line in open("/home/claude/atlas/data/README.md"):
+for line in open("../../data/README.md"):
     m = re.match(r"\| (.+?) \| (.+?) \| (.+?) \|", line.strip())
     if m and "/" in m.group(2):
         mapping[m.group(2).strip()] = m.group(1).strip()
@@ -93,7 +93,8 @@ print(f"Friedman chi2(5) = {stat:.2f}, p = {p:.2e} (n = {len(P32)})")
 
 # ---------- 4. Spearman-Brown ----------
 print("\n=== 4. Spearman-Brown full-length reliabilities ===")
-for label, r in [("Extremum contrast (split-half r = .342)", .342),
-                 ("Full 6-domain profile (split-half r = .167)", .167)]:
+# Split-half medians from analysis4_contrast.py on the v2 (cleaned) data.
+for label, r in [("Extremum contrast (split-half r = .249)", .249),
+                 ("Full 6-domain profile (split-half r = .157)", .157)]:
     sb = 2 * r / (1 + r)
     print(f"{label}: full-length reliability = {sb:.3f}")

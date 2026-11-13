@@ -1,8 +1,11 @@
 """
-Bootstrap 95% CIs for all 198 model-domain cells. 1,000 resamples, seed=42.
+Bootstrap 95% CIs for all 198 model-domain cells. 1,000 resamples.
+Each cell has its own seed, (42, crc32("model|domain")), so an interval depends
+only on that cell's data, not on which other rows or models are present (v2).
 Writes DATA_OUT/atlas_bootstrap_cis.csv. Skips if already present (pre-cached)
 since this step takes ~5 minutes; delete the file to force regeneration.
 """
+import zlib
 import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
@@ -21,7 +24,6 @@ if OUT.exists():
     print(f"  Using cached {OUT.name} ({len(bdf)} cells, median CI width {med_w:.3f})")
     print(f"  (Delete {OUT.name} to force regeneration; takes ~5 min)")
 else:
-    rng = np.random.default_rng(42)
     B = 1000
     rows = []
     for m in mat['model']:
@@ -36,6 +38,8 @@ else:
             if len(np.unique(y)) < 2:
                 continue
             pt = roc_auc_score(y, c)
+            rng = np.random.default_rng(
+                [42, zlib.crc32(f"{m}|{dom_short}".encode())])
             boot = []
             for _ in range(B):
                 idx = rng.integers(0, n, n)

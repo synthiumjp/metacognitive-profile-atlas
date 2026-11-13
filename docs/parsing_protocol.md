@@ -35,8 +35,8 @@ Applied in order; first match wins:
 Observed effect, verified by re-running extraction over the raw run outputs:
 13 of 47,151 responses (0.028%) fell through to `X` — GPT-oss-120B (5),
 Gemini 3.1 FLite (2), Gemma 3 27B (2), Haiku 4.5 (2), Gemma 3 12B (1),
-Qwen 80B Inst (1). No model exceeds 5. `X` records are retained and scored
-incorrect rather than dropped.
+Qwen 80B Inst (1). No model exceeds 5. In version 1 these records were
+retained and scored incorrect; in version 2 they are excluded (`data/raw/`).
 
 ## Confidence extraction
 
@@ -47,20 +47,20 @@ Applied in order; first match wins:
    [0, 100].
 3. If neither matches: the value is **imputed as 50**.
 
-Observed effect and one material caveat. The fallback fired on 985 of 47,151
-responses (2.09%), concentrated almost entirely in one model: **GPT-oss-120B
-accounts for 980 of them (65.3% of its 1,500 responses)**, leaving 5 across the
-other 32 models combined. Separating imputed from expressed values in the raw
-outputs shows GPT-oss-120B has **no** response stating a confidence of 50, so
-every 50 in its series is imputed rather than expressed. Its distribution is
-therefore dominated by the imputation value rather than by expressed
-confidence. This is consistent with the model's anomalous profile reported in
-the paper (confidence SD 21.3 driven by a bimodal expressed/imputed mixture,
-aggregate AUROC .530). Readers should treat GPT-oss-120B's confidence
-distribution as partly imputed; its cells are retained for completeness but the
-imputation share is disclosed here and flagged in the model's results
-discussion. No other model's confidence distribution is materially affected by
-imputation.
+Observed effect. Rule 3 (imputation) fired on 985 of 47,151 responses
+(2.09%): **980 from GPT-oss-120B (65.3% of its 1,500 responses)** and five
+from four other models (Qwen 80B Inst 2, Gemma 3 27B 1, Gemini 2.5 Flash 1,
+Gemini 3.1 FLite 1). Separating imputed from expressed values in the raw
+outputs shows that none of these five models ever states a confidence of 50,
+so every 50 in their series is a parser default.
+
+**Version 1 analysed these imputed values as model output.** For GPT-oss-120B
+this manufactured the profile reported in v1 (confidence SD 21.3, aggregate
+AUROC .530, near-chance and below-chance domain cells). **Version 2 excludes
+all 985 imputed values** (`scripts/v2_clean.py`). On its 518 genuine responses
+GPT-oss-120B has aggregate AUROC .800. Its imputation rate differs by domain
+(59%–74%; χ²(5) = 18.67, p = .002), so its retained items are a non-random
+subset and its domain profile should not be interpreted.
 
 ## Out-of-range, multi-letter, and refusal handling
 
@@ -71,7 +71,7 @@ imputation.
   absent, the fallback captures the first standalone A–D, which for these
   models was the intended answer in spot-checks.
 - Refusals / non-answers produce no `Answer:` line and no in-range integer,
-  yielding `X` (incorrect) and imputed confidence 50.
+  yielding `X` and imputed confidence 50 (excluded in version 2).
 
 ## Model-level exclusion
 
@@ -82,18 +82,20 @@ The run (ID 263787) was queued and remained in an unstarted state: no start or
 end timestamp, no logs, no output. It is excluded because no data exists for
 it, not because of anything in its responses.
 
-## Median binarisation
+## Binarisation for the validity screen
 
-The aggregate validity screen binarises confidence at each model's own median
-before computing L and the KEEP/WITHDRAW-analogue indices. Type-2 AUROC in the
-paper is computed on the **continuous** confidence values, not the binarised
-series; binarisation affects only the screen, not the AUROC hierarchy.
+Version 1 binarised confidence at each model's own median for the validity
+screen. That rule is superseded: with confidence piled at the ceiling the
+verdict depended on how ties at the median were handled. The corrected screen
+(validity-screen 0.3.0; arXiv:2604.17714v2) uses fixed cut points (50, 70, 80,
+90, 95, 100; confidence ≥ cut counts as high). Type-2 AUROC in the paper is
+always computed on the **continuous** confidence values.
 
 ## Reproduction
 
 `notebooks/atlas_benchmark.py` contains `parse_answer` and `parse_confidence`
 verbatim. `scripts/verify_parsing.py` re-runs them over the raw `.run.json`
 files in the HuggingFace `raw_outputs/` directory: the round-trip yields
-47,151 responses, matching the released corpus exactly, and every count in this
-document was produced by it. Per-model fallback counts are released as
+47,151 responses, matching the version 1 corpus (`data/raw_v1/`) exactly, and
+every count in this document was produced by it. Per-model fallback counts are released as
 `data/parsing_fallback_counts.csv`.

@@ -1,0 +1,51 @@
+\begin{table}[!htbp]
+\centering
+\caption{Type-2 AUROC per model-domain cell, all 33 models. $n$ = scored items after excluding unparsed answers and parser-imputed confidences (16 models have fewer than 1{,}500; GPT-oss-120B$^\dagger$ retains 518 after 982 exclusions and should not be interpreted at domain level). Agg = AUROC over all of a model's items. Models grouped by family, sorted by Agg within family.}
+\label{tab:matrix}
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+\textbf{Model} & \textbf{$n$} & \textbf{Applied} & \textbf{Factual} & \textbf{Human.} & \textbf{Social} & \textbf{Formal} & \textbf{Science} & \textbf{Agg} \\
+\midrule
+Opus 4.6 & 1500 & .847 & .818 & .704 & .873 & .743 & .758 & .806 \\
+Opus 4.5 & 1500 & .821 & .795 & .678 & .867 & .787 & .765 & .798 \\
+Sonnet 4.5 & 1500 & .849 & .709 & .715 & .801 & .752 & .758 & .795 \\
+Opus 4.7 & 1499 & .852 & .726 & .692 & .825 & .780 & .816 & .792 \\
+Sonnet 4.6 & 1500 & .887 & .780 & .760 & .694 & .788 & .782 & .777 \\
+Sonnet 4 & 1500 & .828 & .683 & .756 & .794 & .735 & .786 & .773 \\
+Haiku 4.5 & 1498 & .829 & .720 & .793 & .727 & .805 & .706 & .767 \\
+Opus 4.1 & 1500 & .838 & .615 & .711 & .781 & .691 & .636 & .708 \\
+\midrule
+DeepSeek-R1 & 1500 & .843 & .682 & .785 & .814 & .745 & .694 & .769 \\
+DeepSeek V3.2 & 1371 & .713 & .769 & .698 & .669 & .769 & .696 & .734 \\
+DeepSeek V3.1 & 1380 & .756 & .690 & .717 & .636 & .797 & .626 & .716 \\
+\midrule
+Gemini 3.1 Pro & 1346 & .841 & .773 & .764 & .776 & .645 & .640 & .765 \\
+Gemini 3 Flash & 1500 & .800 & .673 & .662 & .794 & .681 & .690 & .731 \\
+Gemini 2.5 Flash & 1360 & .801 & .765 & .644 & .748 & .637 & .664 & .728 \\
+Gemini 2.5 Pro & 981 & .889 & .619 & .623 & .754 & .573 & .485 & .712 \\
+Gemini 3.1 FLite & 1365 & .823 & .752 & .651 & .624 & .566 & .549 & .655 \\
+Gemini 2.0 FLite & 1500 & .688 & .692 & .662 & .555 & .667 & .621 & .639 \\
+Gemini 2.0 Flash & 1500 & .758 & .732 & .663 & .503 & .572 & .606 & .623 \\
+\midrule
+Gemma 4 31B & 1500 & .869 & .663 & .737 & .806 & .812 & .710 & .771 \\
+Gemma 3 27B & 1497 & .585 & .674 & .573 & .528 & .569 & .598 & .565 \\
+Gemma 3 4B & 1445 & .536 & .564 & .506 & .489 & .541 & .566 & .528 \\
+Gemma 3 12B & 1446 & .533 & .613 & .522 & .464 & .554 & .500 & .505 \\
+Gemma 3 1B & 1499 & .495 & .501 & .500 & .490 & .503 & .502 & .498 \\
+\midrule
+GPT-oss-120B$^\dagger$ & 518 & .829 & .855 & .611 & .801 & .515 & .760 & .800 \\
+GPT-oss-20B & 1500 & .769 & .766 & .803 & .827 & .758 & .709 & .793 \\
+GPT-5.4 mini & 1356 & .742 & .797 & .723 & .604 & .572 & .725 & .651 \\
+GPT-5.4 & 1500 & .818 & .778 & .640 & .747 & .539 & .649 & .649 \\
+GPT-5.4 nano & 1500 & .633 & .748 & .726 & .486 & .548 & .615 & .582 \\
+\midrule
+Qwen Think & 1500 & .726 & .680 & .714 & .768 & .644 & .757 & .745 \\
+Qwen Coder & 1500 & .650 & .716 & .723 & .616 & .576 & .695 & .671 \\
+Qwen 80B Inst & 1498 & .648 & .667 & .716 & .691 & .585 & .584 & .637 \\
+Qwen 235B & 1500 & .644 & .622 & .711 & .650 & .567 & .637 & .621 \\
+\midrule
+GLM-5 & 598 & .602 & .576 & .818 & .790 & .609 & .555 & .697 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,44 @@
+{
+ "google/gemini-2.5-flash": {
+  "rows": 1361,
+  "unparsed_answer": 0,
+  "imputed_conf": 1,
+  "kept": 1360
+ },
+ "google/gemini-3.1-flash-lite-preview": {
+  "rows": 1368,
+  "unparsed_answer": 2,
+  "imputed_conf": 1,
+  "kept": 1365
+ },
+ "qwen/qwen3-next-80b-a3b-instruct": {
+  "rows": 1500,
+  "unparsed_answer": 1,
+  "imputed_conf": 1,
+  "kept": 1498
+ },
+ "google/gemma-3-27b": {
+  "rows": 1500,
+  "unparsed_answer": 2,
+  "imputed_conf": 1,
+  "kept": 1497
+ },
+ "openai/gpt-oss-120b": {
+  "rows": 1500,
+  "unparsed_answer": 5,
+  "imputed_conf": 977,
+  "kept": 518
+ },
+ "google/gemma-3-12b": {
+  "rows": 1447,
+  "unparsed_answer": 1,
+  "imputed_conf": 0,
+  "kept": 1446
+ },
+ "anthropic/claude-haiku-4-5@20251001": {
+  "rows": 1500,
+  "unparsed_answer": 2,
+  "imputed_conf": 0,
+  "kept": 1498
+ }
+}
