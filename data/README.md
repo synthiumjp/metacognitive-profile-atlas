@@ -2,7 +2,7 @@
 
 ## Item-level CSVs
 
-One file per model in `data/raw/`, schema:
+`data/raw/` holds the version 2 analysed corpus (46,157 rows). `data/raw_v1/` holds the version 1 corpus exactly as first released (47,151 rows), including 13 unparsed answers (`answer` = X) and 985 confidence values of 50 that the parser imputed when no confidence could be extracted. `scripts/v2_clean.py` derives `raw/` from `raw_v1/` and records what it removed in `v2_exclusions.json`. Files are named by upload order, not by model; each contains one model. Schema:
 
 | column | type | description |
 |--------|------|-------------|
@@ -10,10 +10,10 @@ One file per model in `data/raw/`, schema:
 | subject | str | MMLU subject (e.g., "college_biology") |
 | domain | str | mapped cognitive domain (one of: applied_professional, factual_recall, formal_reasoning, humanities, natural_science, social_moral) |
 | question | str | item text (truncated for storage) |
-| answer | str | model's response letter (A/B/C/D) |
+| answer | str | extracted response letter (A/B/C/D; X = unparsed, v1 only) |
 | correct_answer | str | ground-truth letter |
 | is_correct | bool | whether answer == correct_answer |
-| confidence | int | model's verbalized confidence, 0-100 |
+| confidence | int | extracted verbalized confidence, 0-100 (v1 includes parser-imputed 50s) |
 | model | str | canonical model ID (see below) |
 
 ## Canonical model names
@@ -58,13 +58,13 @@ The 33 models span 8 families. The paper uses short display names (`Opus 4.6`); 
 
 ## Deduplication
 
-The raw upload may contain duplicate item-model rows from overlapping benchmark runs. `reproduce.py` deduplicates with:
+`reproduce.py` deduplicates defensively with:
 
 ```python
 data.drop_duplicates(subset=['model', 'item_id', 'domain'], keep='first')
 ```
 
-After deduplication: 33 models × approximately 1,500 items = 47,151 observations (twelve models have partial runs; see paper §4.7).
+The v1 upload contained one byte-identical duplicate file for GLM-5, which is not carried into `raw_v1/`; neither directory now contains duplicate rows. Sixteen models have fewer than 1,500 rows in `raw/`: twelve partial runs because of platform timeouts and four that lost rows only to the v2 exclusions.
 
 ## Bootstrap CIs
 
@@ -76,10 +76,24 @@ After deduplication: 33 models × approximately 1,500 items = 47,151 observation
 | domain | str | one of Applied / Factual / Human. / Social / Formal / Science |
 | n | int | number of items in this cell |
 | auroc | float | point-estimate AUROC |
-| ci_lo | float | bootstrap 2.5th percentile (1,000 resamples, seed=42) |
+| ci_lo | float | bootstrap 2.5th percentile (1,000 resamples; seed (42, crc32("model|domain")) per cell) |
 | ci_hi | float | bootstrap 97.5th percentile |
 | ci_w | float | width (ci_hi - ci_lo) |
 
 ## Prompt
 
-Every model saw the same elicitation prompt. See `notebooks/benchmark.ipynb` for the exact template.
+Every model saw the same elicitation prompt. See `notebooks/atlas_benchmark.py` for the exact template and `docs/parsing_protocol.md` for the extraction rules.
+
+## Other files
+
+| file | description |
+|---|---|
+| atlas_summary_matrix.csv | 33 × 6 AUROC matrix plus aggregate |
+| atlas_cell_error_counts.csv | per cell: n, errors, accuracy, AUROC, CI |
+| battery_v2.csv | corrected binary-probe battery results for the 20 overlapping models (five keyed tracks; validity-screen 0.3.0; arXiv:2604.17714v2) |
+| v2_exclusions.json | per model: rows, unparsed answers, imputed confidences, rows kept |
+| v2_numbers.json | every number quoted in the v2 paper |
+| glm5_rerun/ | GLM-5 full rerun (July 2026), same schema |
+| mmlu_item_locators.csv | item_id → MMLU (subject, split, row_index) |
+| parsing_fallback_counts.csv | per-model counts for each extraction route |
+| thinking_conf_deepseek-r1-0528.csv | the 82 R1 items whose first-captured confidence differs from the final stated value |

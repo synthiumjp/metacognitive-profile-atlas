@@ -1,0 +1,10 @@
+﻿raw_outputs/
+
+__pycache__/
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.out
+*.bbl
+*.blg

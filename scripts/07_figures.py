@@ -248,104 +248,34 @@ save('fig6_splithalf')
 print("  F6 split-half")
 
 # =============== F7: Cross-benchmark scatter ===============
-battery_auroc = {
-    'Sonnet 4.6': 0.717, 'Qwen Coder': 0.686, 'Haiku 4.5': 0.657,
-    'DeepSeek V3.2': 0.651, 'Qwen 235B': 0.648, 'GPT-5.4': 0.646,
-    'GPT-5.4 mini': 0.633, 'Gemma 3 27B': 0.631, 'Opus 4.6': 0.617,
-    'GLM-5': 0.587, 'Qwen 80B Inst': 0.584, 'Qwen Think': 0.518,
-    'Gemini 2.5 Flash': 0.579, 'Gemini 2.5 Pro': 0.561,
-    'Gemini 3 Flash': 0.539, 'Gemma 3 12B': 0.615, 'GPT-5.4 nano': 0.565,
-    'Gemma 3 1B': 0.483, 'Gemini 3.1 Pro': 0.522, 'DeepSeek-R1': 0.031,
-}
-battery_tier = {
-    'Opus 4.6': 'Valid', 'Sonnet 4.6': 'Valid', 'Haiku 4.5': 'Valid',
-    'Gemini 2.5 Pro': 'Valid', 'Gemini 2.5 Flash': 'Valid', 'Gemini 3 Flash': 'Valid',
-    'Gemini 3.1 Pro': 'Invalid', 'GLM-5': 'Valid',
-    'GPT-5.4': 'Valid', 'GPT-5.4 mini': 'Valid', 'GPT-5.4 nano': 'Indeterminate',
-    'Gemma 3 27B': 'Valid', 'Gemma 3 12B': 'Indeterminate', 'Gemma 3 1B': 'Indeterminate',
-    'DeepSeek-R1': 'Invalid', 'DeepSeek V3.2': 'Valid',
-    'Qwen Think': 'Invalid', 'Qwen 80B Inst': 'Valid',
-    'Qwen Coder': 'Valid', 'Qwen 235B': 'Valid',
-}
-cross = pd.DataFrame([
-    {'model': m, 'family': mat.loc[mat['model'] == m, 'family'].iloc[0],
-     'battery_auroc': battery_auroc[m],
-     'mmlu_auroc': mat.loc[mat['model'] == m, 'aggregate'].iloc[0],
-     'battery_tier': battery_tier.get(m, 'Valid')}
-    for m in mat['model'] if m in battery_auroc
-])
+# Battery values: five keyed tracks, validity-screen 0.3.0 (Cacioli, arXiv:2604.17714v2).
+# Written to data/battery_v2.csv from that paper's released outputs.
+bat = pd.read_csv(DATA_OUT / "battery_v2.csv")
+cross = bat.merge(mat[['model', 'family', 'aggregate']], on='model')
+cross = cross.rename(columns={'aggregate': 'mmlu_auroc'})
+assert len(cross) == 20, len(cross)
 
-fig = plt.figure(figsize=(8.5, 5.8))
-gs = GridSpec(1, 2, width_ratios=[1, 10], wspace=0.04)
-ax_r1 = fig.add_subplot(gs[0, 0]); ax = fig.add_subplot(gs[0, 1])
-
+fig, ax = plt.subplots(figsize=(7.2, 5.6))
 TIER_M = {'Valid': 'o', 'Indeterminate': 's', 'Invalid': 'X'}
 TIER_C = {'Valid': '#2ca02c', 'Indeterminate': '#ff7f0e', 'Invalid': '#d62728'}
 for tier, mark in TIER_M.items():
     sub = cross[cross['battery_tier'] == tier]
     if len(sub) == 0: continue
-    for axx in (ax, ax_r1):
-        axx.scatter(sub['battery_auroc'], sub['mmlu_auroc'], marker=mark,
-                    color=TIER_C[tier], s=90, edgecolor='black', linewidth=0.8, alpha=0.85,
-                    label=f"Battery {tier} (n={len(sub)})" if axx is ax else None)
-
-ax_r1.set_xlim(-0.05, 0.10); ax_r1.set_ylim(0.45, 0.85)
-ax_r1.set_xticks([0.0]); ax_r1.set_xticklabels(['0.0'])
-ax_r1.set_ylabel('MMLU AUROC (verbalized 0-100; this paper)')
-ax_r1.grid(linestyle=':', alpha=0.3)
-ax_r1.spines['right'].set_visible(False)
-r1_row = cross[cross['model'] == 'DeepSeek-R1'].iloc[0]
-ax_r1.annotate('DeepSeek-R1', xy=(r1_row['battery_auroc'], r1_row['mmlu_auroc']),
-               xytext=(0, 10), textcoords='offset points', fontsize=7,
-               ha='center', color='#333')
-
-ax.set_xlim(0.45, 0.80); ax.set_ylim(0.45, 0.85)
-ax.spines['left'].set_visible(False)
-ax.tick_params(left=False, labelleft=False)
-ax.plot([0.45, 0.80], [0.45, 0.80], color='black', linewidth=0.8, alpha=0.4, linestyle='--')
-ax.axhline(0.50, color='gray', linewidth=0.5, linestyle=':', alpha=0.5)
-ax.axvline(0.50, color='gray', linewidth=0.5, linestyle=':', alpha=0.5)
-ax_r1.axhline(0.50, color='gray', linewidth=0.5, linestyle=':', alpha=0.5)
-
-d = 0.015
-for (a, kw) in [(ax_r1, dict(transform=ax_r1.transAxes)), (ax, dict(transform=ax.transAxes))]:
-    kw.update(dict(color='k', clip_on=False, linewidth=1))
-    if a is ax_r1:
-        a.plot((1 - d, 1 + d), (-d, d), **kw)
-        a.plot((1 - d, 1 + d), (1 - d, 1 + d), **kw)
-    else:
-        a.plot((-d/10, d/10), (-d, d), **kw)
-        a.plot((-d/10, d/10), (1 - d, 1 + d), **kw)
-
-ax.set_xlabel('Battery AUROC (binary KEEP/WITHDRAW + BET; Cacioli 2026f)')
-ax.xaxis.set_label_coords(0.42, -0.08)
-
-LABEL_OFFSETS = {
-    'Opus 4.6': (8, 6, 'left'), 'Sonnet 4.6': (8, 0, 'left'), 'Haiku 4.5': (8, 0, 'left'),
-    'DeepSeek V3.2': (8, -8, 'left'), 'Gemini 3.1 Pro': (10, 0, 'left'),
-    'Gemini 3 Flash': (-5, -12, 'right'), 'Gemini 2.5 Flash': (8, 4, 'left'),
-    'Gemini 2.5 Pro': (8, -4, 'left'), 'Gemma 3 27B': (8, -2, 'left'),
-    'Gemma 3 12B': (8, 2, 'left'), 'Gemma 3 1B': (-5, -12, 'right'),
-    'GPT-5.4 mini': (-5, 8, 'right'), 'GPT-5.4': (10, -2, 'left'),
-    'Qwen 80B Inst': (-5, -10, 'right'), 'GPT-5.4 nano': (8, 0, 'left'),
-    'Qwen Think': (10, 0, 'left'), 'Qwen Coder': (8, 0, 'left'),
-    'Qwen 235B': (8, 0, 'left'), 'GLM-5': (8, -2, 'left'),
-}
+    ax.scatter(sub['battery_auroc'], sub['mmlu_auroc'], marker=mark, color=TIER_C[tier], s=90,
+               edgecolor='black', linewidth=0.8, alpha=0.85, label=f"Battery {tier} (n={len(sub)})")
+ax.plot([0.3, 0.85], [0.3, 0.85], color='black', linewidth=0.8, alpha=0.4, linestyle='--')
+ax.axhline(0.50, color='gray', linewidth=0.5, linestyle=':', alpha=0.6)
+ax.axvline(0.50, color='gray', linewidth=0.5, linestyle=':', alpha=0.6)
+ax.set_xlim(0.28, 0.80); ax.set_ylim(0.45, 0.85)
+ax.set_xlabel('Battery Type-2 AUROC (binary KEEP/WITHDRAW + BET, five keyed tracks)')
+ax.set_ylabel('Atlas MMLU AUROC (verbalized 0-100)')
 for _, r in cross.iterrows():
-    if r['model'] == 'DeepSeek-R1': continue
-    dx, dy, ha = LABEL_OFFSETS.get(r['model'], (6, -3, 'left'))
-    ax.annotate(r['model'], xy=(r['battery_auroc'], r['mmlu_auroc']),
-                xytext=(dx, dy), textcoords='offset points', fontsize=7,
-                ha=ha, color='#333')
-
-ax.legend(loc='upper left', fontsize=8, frameon=True)
+    ax.annotate(r['model'], xy=(r['battery_auroc'], r['mmlu_auroc']), xytext=(5, -3),
+                textcoords='offset points', fontsize=6.5, color='#333')
+ax.legend(loc='lower left', fontsize=8, frameon=True)
 ax.grid(linestyle=':', alpha=0.3)
-
-r_full, _ = pearsonr(cross['battery_auroc'], cross['mmlu_auroc'])
-valid = cross[cross['battery_tier'] == 'Valid']
-r_val, _ = pearsonr(valid['battery_auroc'], valid['mmlu_auroc'])
-fig.suptitle(f'Cross-benchmark stability (n=20 models)\n'
-             f'Full sample r = {r_full:.3f}; Battery-Valid only r = {r_val:.3f}',
-             fontsize=11, y=0.99)
+from scipy.stats import spearmanr
+rho, _ = spearmanr(cross['battery_auroc'], cross['mmlu_auroc'])
+ax.set_title(f'Binary-probe battery vs verbalized-confidence atlas (n = 20); Spearman rho = {rho:+.2f}', fontsize=10)
 save('fig7_cross_benchmark')
-print("  F7 cross-benchmark")
+print(f"  F7 cross-benchmark (rho = {rho:+.3f})")

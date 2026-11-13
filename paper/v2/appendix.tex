@@ -1,0 +1,220 @@
+\section{Changes from version 1}
+\label{app:changes}
+
+Table~\ref{tab:changes} lists every claim in version 1 that this version withdraws or materially changes. Version 1 remains available on arXiv for the record.
+
+\begin{table}[!htbp]
+\centering
+\caption{Claims changed between version 1 and version 2.}
+\label{tab:changes}
+\small
+\begin{tabular}{p{0.44\textwidth}p{0.50\textwidth}}
+\toprule
+\textbf{Version 1} & \textbf{Version 2} \\
+\midrule
+GPT-oss-120B shows the highest confidence variability (SD 21.3) with near-chance discrimination (AUROC .530) and below-chance Science monitoring, a distinct failure mode. & Withdrawn. 980 of its 1{,}500 confidence values were the parser default of 50. On its 518 genuine responses AUROC is .800. The retained items are a non-random subset, and the domain profile is not interpreted (\S\ref{sec:anomalous}, Appendix~\ref{app:gptoss}). \\
+\addlinespace
+Within OpenAI, GPT-oss-20B outperforms the six-times-larger GPT-oss-120B, so training recipe dominates scale. & Withdrawn; it rested on the imputed values. \\
+\addlinespace
+DeepSeek-R1, Gemini 3.1 Pro and Qwen Think are battery-Invalid; R1 shows catastrophic inversion on the binary probe. & Corrected from arXiv:2604.17714v2. R1 is Invalid because it withdraws 95\% of its correct answers; it is not inverted. Gemini 3.1 Pro and Qwen Think are Indeterminate (blanket confidence suspected but not certifiable on 24 and 27 errors). \\
+\addlinespace
+Tier-level assignments are preserved across probe formats in every battery-Valid case. & Withdrawn. Battery AUROC does not predict atlas AUROC ($\rho = .00$), and three battery-Valid Gemma 3 models barely discriminate on MMLU (\S\ref{sec:probe}). \\
+\addlinespace
+Introduction: every Valid model in a 20-model battery sample had a domain AUROC below .55 \citep{cacioli2026c}. & Removed; it relied on the battery scoring corrected in arXiv:2604.17714v2. \\
+\addlinespace
+The Gemma 3 $\to$ Gemma 4 step shows that a single generational step can recover an entire class of failure modes. & Reframed. The paired-item decomposition shows that step is mainly error removal, not improved monitoring (Table~\ref{tab:generational}). \\
+\addlinespace
+Profile-level split-half: grand median $r = .184$, 61\% of models positive; aggregate split-half $r = .893$. & Recomputed: grand median $r = .076$, 58\% positive; aggregate $r = .868$. Claims rest on the population-level extremum ordering. \\
+\addlinespace
+Friedman $\chi^2(5) = 27.04$, $W = .164$; 47{,}151 observations. & $\chi^2(5) = 28.26$, $W = .171$; 46{,}157 observations. The ordering is unchanged. \\
+\addlinespace
+The excluded MMLU subject is \texttt{elementary\_mathematics}. & The excluded subject is \texttt{college\_medicine}; \texttt{elementary\_mathematics} is mapped to Formal Reasoning. The analysis was always run with the correct mapping; only the text was wrong. \\
+\addlinespace
+Cross-study comparison with MMLU AUROCs computed from median-binarised confidence. & Removed. Median binarisation is superseded in the validity screen \citep{cacioli2026e}, whose verdicts depend on tie handling. \\
+\addlinespace
+Figure 1 colour scale described as diverging around chance (.50). & The scale spans .40--.90, so its visual midpoint is about .65. The caption now says so. \\
+\addlinespace
+``Confidence reliability'', ``monitoring quality'' used for Type-2 AUROC. & ``Confidence discrimination''. Type-2 AUROC measures discrimination, not calibration or reliability in the psychometric sense. \\
+\addlinespace
+Bootstrap intervals drawn from one random stream across all cells (seed 42). & Each cell seeded separately, so an interval depends only on its own data. Interval endpoints shift by up to a few hundredths. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Elicitation prompt template}
+\label{app:prompt}
+
+\begin{verbatim}
+Answer this multiple-choice question.
+
+{question}
+
+First, state your answer (A, B, C, or D).
+Then, state your confidence that your answer is correct as a number from 0
+(pure guess) to 100 (certain).
+
+Reply in EXACTLY this format:
+Answer: [letter]
+Confidence: [number]
+\end{verbatim}
+
+Each (model, item) pair used an independent conversation context. Greedy decoding (temperature 0) throughout.
+
+\section{Answer and confidence parsing}
+\label{app:parsing}
+
+Answers and confidences were extracted from each response by fixed rules, applied in order with the first match winning. The code is released (\texttt{notebooks/atlas\_benchmark.py}), and a verification script re-runs it over the raw platform outputs and reproduces all 47{,}151 records.
+
+\textbf{Answer.} (1) \texttt{Answer:\textbackslash s*([A-Da-d])}; (2) otherwise the first standalone letter A--D; (3) otherwise the answer is recorded as X. Thirteen responses (0.03\%) were X: GPT-oss-120B 5, Gemini 3.1 Flash-Lite 2, Gemma 3 27B 2, Haiku 4.5 2, Gemma 3 12B 1, Qwen3 Next 80B Instruct 1. Version 1 scored them as incorrect; version 2 excludes them. The fallback rule fired on 42 responses, 28 of them from Gemini 2.5 Flash. A first standalone letter can occasionally be an unintended one (for example the article ``A''); spot checks found the intended answer.
+
+\textbf{Confidence.} (1) \texttt{Confidence:\textbackslash s*(\textbackslash d+)}, clipped to 0--100; (2) otherwise the first standalone integer of up to three digits in 0--100; (3) otherwise the value 50 is imputed. Rule 3 fired on 985 responses: 980 from GPT-oss-120B (65\% of its responses) and five from four other models. The raw outputs show that none of these five models ever states a confidence of 50, so each 50 in their series is a parser default. All 985 are excluded in version 2 (some coincide with X answers). Per-model counts for every route are released (\texttt{data/parsing\_fallback\_counts.csv}).
+
+\textbf{Reasoning traces.} For DeepSeek-R1, whose output includes its reasoning, rule 1 captures the first ``Confidence:'' in the response, which can fall inside the reasoning rather than in the final answer. On 82 items (5.5\%) the captured value differs from the final stated confidence (mean 82.0 versus 87.4). Using the final values changes R1's aggregate AUROC from .769 to .766. The released data keep the values as originally extracted, and the discrepant items are listed in \texttt{data/thinking\_conf\_deepseek-r1-0528.csv}.
+
+\textbf{Models and runs.} Gemma 4 26B A4B appears in the benchmark's model list but its run never started (no logs or outputs), so no data exist for it. No model was excluded on the basis of its responses.
+
+\section{Full 33-model AUROC matrix}
+\label{app:matrix}
+
+Table~\ref{tab:matrix} reports Type-2 AUROC for every model-domain cell. Figure~\ref{fig:heatmap} shows the same values.
+
+\input{table_3.tex}
+
+\section{GPT-oss-120B}
+\label{app:gptoss}
+
+GPT-oss-120B produced a parseable confidence on 520 of 1{,}500 items, and 518 remain after the two further unparsed answers are excluded. The imputation rate differs by domain, from 59\% (Natural Science) to 74\% (Factual Recall) ($\chi^2(5) = 18.67$, $p = .002$), so the retained items are not a random sample of the item pool. Accuracy is similar on imputed and retained items (.900 and .896), but whether the model states a confidence at all may depend on item properties that also bear on discrimination. Its aggregate AUROC (.800) and domain values (Table~\ref{tab:matrix}) are reported for completeness. With 65--102 items per domain and intervals as wide as [.128, .918] (Formal), its domain profile should not be interpreted. Excluding the model entirely leaves the domain ordering unchanged (Friedman $\chi^2(5) = 26.43$, $p < .0001$, $n = 32$).
+
+\section{Robustness analyses}
+\label{app:robust}
+
+\textbf{Pairwise contrasts.} Table~\ref{tab:pairs} gives Wilcoxon signed-rank tests over the 33 models for all 15 domain pairs, Holm-corrected.
+
+\begin{table}[!htbp]
+\centering
+\caption{Pairwise domain contrasts (Wilcoxon signed-rank over 33 models; Holm correction across 15 pairs). Diff = mean AUROC difference, first minus second.}
+\label{tab:pairs}
+\small
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Pair} & \textbf{Diff} & \textbf{$p$} & \textbf{$p_{\text{Holm}}$} \\
+\midrule
+Applied vs Science & .088 & $<.0001$ & $<.0001$ \\
+Applied vs Formal & .094 & $<.0001$ & $<.0001$ \\
+Applied vs Social & .053 & .0003 & .005 \\
+Applied vs Humanities & .062 & .001 & .011 \\
+Factual vs Science & .042 & .005 & .057 \\
+Applied vs Factual & .046 & .014 & .144 \\
+Factual vs Formal & .048 & .035 & .318 \\
+Formal vs Social & $-$.041 & .044 & .355 \\
+Science vs Social & $-$.035 & .060 & .420 \\
+Formal vs Humanities & $-$.033 & .063 & .420 \\
+Humanities vs Science & .026 & .135 & .674 \\
+Factual vs Humanities & .016 & .280 & 1.000 \\
+Humanities vs Social & $-$.009 & .597 & 1.000 \\
+Factual vs Social & .007 & .846 & 1.000 \\
+Formal vs Science & $-$.007 & .874 & 1.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Rank stability.} Items were resampled with replacement within every model-domain cell (500 resamples), and domain means were re-ranked each time. Applied ranked first in 100\% of resamples. The probability of a bottom-two rank was .932 for Formal, .924 for Science, .132 for Humanities, .008 for Social, .004 for Factual and 0 for Applied.
+
+\textbf{Error counts.} AUROC in a cell with few errors is unstable. Cells have a median of 20 errors (minimum 2); 28 cells have fewer than 10 and 5 have fewer than 5. Per-cell counts are in Table~\ref{tab:s1}.
+
+\textbf{Subject level.} For the 47 subjects with at least 30 errors pooled across models, the seven Applied subjects have a mean AUROC rank of 19.6, against 28.8 for 11 Formal subjects and 21.1 for nine Science subjects. Applied subjects do not rank significantly higher than Formal and Science subjects combined (one-sided Mann--Whitney $U = 87$, $p = .18$). The domain-level ordering is a property of the bins in aggregate, not a uniform property of their subjects.
+
+\section{Reliability}
+\label{app:splithalf}
+
+Items were randomly split into halves, and AUROC was computed on each half for every model (Figure~\ref{fig:splithalf}). Aggregate AUROC correlates $r = .868$ across models between halves. For the population-level extremum contrast (Applied minus the mean of Formal and Science), the cross-model split-half correlation has median .249 over 50 splits (IQR .162--.343), and its population mean is positive in both halves in all 50. For full six-domain profiles, the within-model correlation between halves has median .157 over the same splits. Over 100 splits the grand median of per-model medians is .076, and 58\% of models are positive. These estimates move by several hundredths when a handful of records change, which is itself a sign of their imprecision.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{fig6_splithalf.pdf}
+\caption{Split-half stability of aggregate Type-2 AUROC across 33 models. Each point is one model; axes are AUROC on two random halves of its items. Cross-model $r = .868$.}
+\label{fig:splithalf}
+\end{figure}
+
+\section{Families and generations}
+\label{app:families}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{fig4_family_means.pdf}
+\caption{Family mean domain profiles (Type-2 AUROC). Exploratory; see \S\ref{sec:hierarchy} on profile reliability.}
+\label{fig:families}
+\end{figure}
+
+\textbf{Item-level transitions.} Table~\ref{tab:transitions} cross-classifies shared items by correctness under the earlier and later model in three generational pairs. Per-item confidence correlates more weakly across the Gemma step (Spearman $\rho = .36$) than across Anthropic steps (.75--.85) or DeepSeek steps (.66--.68).
+
+\begin{table}[!htbp]
+\centering
+\caption{Correctness transitions on shared items (W = wrong, C = correct; earlier $\to$ later). The last column is the later model's mean confidence on items it newly gets wrong.}
+\label{tab:transitions}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+\textbf{Pair} & \textbf{W$\to$W} & \textbf{W$\to$C} & \textbf{C$\to$W} & \textbf{C$\to$C} & \textbf{Conf.\ on C$\to$W} \\
+\midrule
+Gemma 3 27B $\to$ Gemma 4 31B & 57 & 265 & 32 & 1{,}144 & 90.8 \\
+Opus 4.1 $\to$ Opus 4.7 & 49 & 37 & 31 & 1{,}382 & 71.5 \\
+DeepSeek V3.2 $\to$ R1 & 71 & 64 & 48 & 1{,}188 & 84.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{GLM-5 retest}
+\label{app:glm5}
+
+GLM-5's original run stopped after 598 items. It was rerun on the full item set three months later under the same prompt and settings. Table~\ref{tab:glm5} compares the two runs on the 598 shared items. The six domain values correlate $\rho = .77$ ($p = .072$) and $r = .75$. Correctness agrees on 98.5\% of items, and item-level confidence correlates $r = .71$. In both runs Humanities exceeds Applied. With 2 to 14 errors per domain, neither run's domain estimates are precise.
+
+\begin{table}[!htbp]
+\centering
+\caption{GLM-5 on the same 598 items in two runs three months apart: errors and Type-2 AUROC per domain.}
+\label{tab:glm5}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+& & \multicolumn{2}{c}{\textbf{Original run}} & \multicolumn{2}{c}{\textbf{Rerun}} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+\textbf{Domain} & \textbf{$n$} & \textbf{Errors} & \textbf{AUROC} & \textbf{Errors} & \textbf{AUROC} \\
+\midrule
+Applied & 84 & 4 & .602 & 5 & .639 \\
+Factual & 111 & 8 & .576 & 10 & .702 \\
+Formal & 102 & 3 & .609 & 5 & .757 \\
+Humanities & 91 & 3 & .818 & 2 & .792 \\
+Science & 110 & 3 & .555 & 4 & .709 \\
+Social & 100 & 14 & .790 & 12 & .777 \\
+\midrule
+Aggregate & 598 & 35 & .697 & 38 & .759 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Partial runs}
+\label{app:partial}
+
+Twelve runs are incomplete because of platform timeouts; the smallest are GLM-5 (598 items) and Gemini 2.5 Pro (981). Four further models fall below 1{,}500 only because of the exclusions in Appendix~\ref{app:parsing}. Whether an item is present was tested against its domain for each incomplete model ($\chi^2$, 5 df). Presence is unrelated to domain ($p > .07$) for every model except Gemma 3 12B ($p = .010$; 54 items missing) and GPT-oss-120B ($p = .003$; Appendix~\ref{app:gptoss}).
+
+\section{Future directions}
+
+\textbf{Transport.} Whether the population-level ordering holds on a benchmark with non-overlapping items (for example GPQA) and under other elicitation formats is the main open question.
+
+\textbf{Mechanism.} Hidden-state analyses of open-weight models (Gemma 4 31B, GPT-oss-20B, Qwen Think) could test whether Applied items produce more separable internal states than Formal items.
+
+\textbf{Precision.} Per-model profiles would need many more errors per cell to be interpretable. For high-accuracy models that means many more items per domain, or harder items.
+
+\textbf{Repair.} Whether targeted fine-tuning with confidence in the training signal can raise discrimination in a model's weakest domain is untested. The Gemma step shows that a large aggregate gain can come from error removal alone (Table~\ref{tab:generational}), so any such test should decompose its effect the same way.
+
+\section{Procedural analogy to clinical assessment}
+\label{app:neuropsych}
+
+Clinical neuropsychological assessment follows a fixed interpretive sequence. Validity indicators are checked first \citep{larrabee2012}. If the protocol is valid, aggregate scores give an overall level, and the profile of index scores is then examined for relative strengths and weaknesses. The atlas follows the same order: screen the confidence signal \citep{cacioli2026e}, compute the aggregate, then examine the domain profile. The analogy is procedural only. Human cognitive domains rest on extensive factor-analytic validation; the MMLU bins used here do not, and \S\ref{sec:hierarchy} shows they are not cohesive. The analogy also marks a limit: in clinical practice an index score is interpreted only when its reliability supports it, and at current item counts most per-model domain profiles here do not meet that standard.
+
+\section{Bootstrap intervals and error counts}
+\label{app:ci}
+
+Table~\ref{tab:s1} gives bootstrap 95\% intervals and error counts for all 198 model-domain cells. Median interval width is .202.
+
+\input{table_s1.tex}
