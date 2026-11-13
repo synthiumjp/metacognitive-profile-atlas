@@ -18,7 +18,7 @@
 > - **Claims are narrowed** to the population-level domain ordering, which survives precision weighting, bootstrap rank analysis and Holm-corrected contrasts. Per-model profiles have weak split-half reliability and are released as exploratory.
 > - **The excluded MMLU subject is `college_medicine`**, not `elementary_mathematics` as v1 stated (the analysis always used the correct mapping).
 >
-> Appendix A of the v2 paper lists every changed claim. The version 1 data are kept unchanged in `data/raw_v1/`; the v1 release is tagged [`v1.0`](https://github.com/synthiumjp/metacognitive-profile-atlas/tree/v1.0).
+> Appendix A of the v2 paper lists every changed claim. The version 1 data are kept unchanged in `data/raw_v1/`; the full v1 repository state is preserved on the [`v1`](https://github.com/synthiumjp/metacognitive-profile-atlas/tree/v1) branch.
 
 ## What this is
 
